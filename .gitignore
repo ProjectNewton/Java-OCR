@@ -11,10 +11,7 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 .idea
-TicTacToe.iml
 
-.gradle
-build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -27,3 +24,4 @@ gradle-app.setting
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
+JavaORC.iml
