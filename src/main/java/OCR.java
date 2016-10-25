@@ -2,7 +2,7 @@
  * Optical Character Recognition
  * 
  * @author Ethan Zheng, Rohan D'Souza
- * @version 101716
+ * @version 102516
  */
 
 import java.awt.*;
@@ -19,11 +19,11 @@ public class OCR
     {
         int[] histogram = new int[256];
         
-        for(int i=0; i<histogram.length; i++)
+        for(int i = 0; i < histogram.length; i++)
             histogram[i] = 0;
             
-        for(int i=0; i<input.getWidth(); i++)
-            for(int j=0; j<input.getHeight(); j++)
+        for(int i = 0; i < input.getWidth(); i++)
+            for(int j = 0; j < input.getHeight(); j++)
             {
                 int red = new Color(input.getRGB (i, j)).getRed();
                 histogram[red]++;
@@ -62,7 +62,7 @@ public class OCR
         int total = o.getHeight() * o.getWidth();
  
         float sum = 0;
-        for(int i=0; i<256; i++) 
+        for(int i = 0; i < 256; i++) 
             sum += i * histogram[i];
         float sumB = 0;
         int wB = 0;
@@ -99,8 +99,8 @@ public class OCR
         int threshold = otsuThreshold(o);
         BufferedImage binarized = new BufferedImage(o.getWidth(), o.getHeight(), o.getType());
  
-        for(int i=0; i<o.getWidth(); i++)
-            for(int j=0; j<o.getHeight(); j++)
+        for(int i = 0; i < o.getWidth(); i++)
+            for(int j = 0; j < o.getHeight(); j++)
             {
                 red = new Color(o.getRGB(i, j)).getRed();
                 int alpha = new Color(o.getRGB(i, j)).getAlpha();
@@ -118,19 +118,39 @@ public class OCR
     private static BufferedImage reduceNoise(BufferedImage o)
     {
         BufferedImage r = new BufferedImage(o.getWidth(), o.getHeight(), o.getType());
+        Color[] pixel = new Color[9];
+        int[] R = new int[9];
+        
+        for (int i = 1; i < o.getWidth() - 1; i++)
+            for (int j = 1; j < o.getHeight() - 1; j++)
+            {
+                pixel[0] = new Color(o.getRGB(i - 1, j - 1));
+                pixel[1] = new Color(o.getRGB(i - 1, j));
+                pixel[2] = new Color(o.getRGB(i - 1, j + 1));
+                pixel[3] = new Color(o.getRGB(i , j + 1));
+                pixel[4] = new Color(o.getRGB(i + 1, j + 1));
+                pixel[5] = new Color(o.getRGB(i + 1, j));
+                pixel[6] = new Color(o.getRGB(i + 1, j - 1));
+                pixel[7] = new Color(o.getRGB(i, j - 1));
+                pixel[8] = new Color(o.getRGB(i, j));
+                for(int k = 0; k < 9; k++)
+                    R[k] = pixel[k].getRed();
+                Arrays.sort(R);
+                r.setRGB(i, j, toRGB(255, R[4], R[4], R[4]));
+            }
+                    
         return r;
     }
     
+    /*private static int[][] detectContours(BufferedImage i)
+    {
+        
+    }*/
+    
     private static int toRGB(int alpha, int red, int green, int blue)
     {
-        int pixel = 0;
-
-        pixel += alpha;    pixel = pixel << 8;
-        pixel += red;      pixel = pixel << 8;
-        pixel += green;    pixel = pixel << 8;
-        pixel += blue;
- 
-        return pixel;
+        Color pixel = new Color(red, green, blue, alpha);
+        return pixel.getRGB();
     }
     
     public static void main(String[] args) throws IOException
