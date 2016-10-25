@@ -114,30 +114,56 @@ public class OCR
             
         return binarized;
     }
-    
+
     private static BufferedImage reduceNoise(BufferedImage o)
     {
         BufferedImage r = new BufferedImage(o.getWidth(), o.getHeight(), o.getType());
         Color[] pixel = new Color[9];
         int[] R = new int[9];
         
-        for (int i = 1; i < o.getWidth() - 1; i++)
-            for (int j = 1; j < o.getHeight() - 1; j++)
+        for (int outX = 1; outX < o.getWidth() - 1; outX++)
+            for (int outY = 1; outY < o.getHeight() - 1; outY++)
             {
-                pixel[0] = new Color(o.getRGB(i - 1, j - 1));
-                pixel[1] = new Color(o.getRGB(i - 1, j));
-                pixel[2] = new Color(o.getRGB(i - 1, j + 1));
-                pixel[3] = new Color(o.getRGB(i , j + 1));
-                pixel[4] = new Color(o.getRGB(i + 1, j + 1));
-                pixel[5] = new Color(o.getRGB(i + 1, j));
-                pixel[6] = new Color(o.getRGB(i + 1, j - 1));
-                pixel[7] = new Color(o.getRGB(i, j - 1));
-                pixel[8] = new Color(o.getRGB(i, j));
+                int tempX = outX-1;
+                int tempY = outY-1;
+                int index = 0;
+                for (int x = 0; x < 3; x++) {
+                    for (int y = 0; y < 3; y++) {
+                        if (tempX < 0) {
+                            x = x - tempX;
+                            tempX = 0;
+                        }
+                        else if (tempY < 0) {
+                            y = y - tempY;
+                            tempY = 0;
+                        }
+                        pixel[index] = new Color(o.getRGB(x,y));
+                        index++;
+                    }
+                }
+                /*pixel[0] = new Color(o.getRGB(outX - 1, outY - 1));
+                pixel[1] = new Color(o.getRGB(outX - 1, outY));
+                pixel[2] = new Color(o.getRGB(outX - 1, outY + 1));
+                pixel[3] = new Color(o.getRGB(outX , outY + 1));
+                pixel[4] = new Color(o.getRGB(outX + 1, outY + 1));
+                pixel[5] = new Color(o.getRGB(outX + 1, outY));
+                pixel[6] = new Color(o.getRGB(outX + 1, outY - 1));
+                pixel[7] = new Color(o.getRGB(outX, outY - 1));
+                pixel[8] = new Color(o.getRGB(outX, outY));*/
                 for(int k = 0; k < 9; k++)
                     R[k] = pixel[k].getRed();
                 Arrays.sort(R);
-                r.setRGB(i, j, toRGB(255, R[4], R[4], R[4]));
+                r.setRGB(outX, outY, toRGB(255, R[4], R[4], R[4]));
             }
+        /*
+        *
+        * 0100000
+        * 0000000
+        * 0000000
+        * 0000000
+        *
+        *
+        * */
                     
         return r;
     }
