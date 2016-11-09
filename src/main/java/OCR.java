@@ -242,6 +242,4 @@ public class OCR
 
 
     }
-
-
 }
