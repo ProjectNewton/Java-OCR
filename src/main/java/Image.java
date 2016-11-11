@@ -205,9 +205,35 @@ public class Image {
         }
     }
 
-    public static ArrayList<int[][]> getMaxims(BufferedImage img, int x, int y) {
-        int leftX, lexfY, rightX, rightY;
+    public static int[][] getMaxims(BufferedImage img, int x, int y) {
+        int left = 0, right = 0, top = 0, bottom = 0;
+        for (int j = 0; j < 3; j++) {
+            for (int i = 0; i < 3; i++) {
+                if (x > 0) {
+                    x--;
+                } else if (y > 0) {
+                    y--;
+                } else {
+                    i++; j++;
+                }
 
+                if (j < left) {
+                    left = j;
+                }
+                if (j > right) {
+                    right = j;
+                }
+                if (i < bottom) {
+                    bottom = i;
+                }
+                if (i > top) {
+                    top = i;
+                }
+            }
+        }
+        return new int[][] {
+                {left,top}, {left, bottom}, {right, top}, {right,bottom}
+        };
     }
 
     public static boolean toBinary(int rgb) {
