@@ -203,6 +203,7 @@ public class Image {
                 }
             }
         }
+        return null;
     }
 
     public static int[][] getMaxims(BufferedImage img, int x, int y) {
@@ -240,7 +241,4 @@ public class Image {
         return rgb == BLACK;
     }
 
-    public static void main(String[] args) {
-
-    }
 }
