@@ -13,7 +13,7 @@ import javax.imageio.*;
 public class OCR
 {
 
-    static void main(String[] args) throws IOException
+    public static void main(String[] args) throws IOException
     {
         String filename = "Pics/sign1.jpg";
         int index = filename.indexOf(".");

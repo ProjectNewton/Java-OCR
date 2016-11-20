@@ -196,16 +196,8 @@ public class Image {
         return img;
     }
 
-    public static BufferedImage Segment(BufferedImage img) {
-        for (int y = 0; y < img.getHeight (); y++) {
-            for (int x = 0; x < img.getWidth (); x++) {
-                if (img.getRGB (x,y) == RED) {
-                }
-            }
-        }
-    }
 
-    public static int[][] getMaxims(BufferedImage img, int x, int y) {
+    /*public static int[][] getMaxims(BufferedImage img, int x, int y) {
         int left = 0, right = 0, top = 0, bottom = 0;
         for (int j = 0; j < 3; j++) {
             for (int i = 0; i < 3; i++) {
@@ -235,12 +227,8 @@ public class Image {
                 {left,top}, {left, bottom}, {right, top}, {right,bottom}
         };
     }
-
+*/
     public static boolean toBinary(int rgb) {
         return rgb == BLACK;
-    }
-
-    public static void main(String[] args) {
-
     }
 }
