@@ -240,5 +240,4 @@ public class Image {
     public static boolean toBinary(int rgb) {
         return rgb == BLACK;
     }
-
 }
