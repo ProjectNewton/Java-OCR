@@ -15,7 +15,7 @@ public class OCR
 
     public static void main(String[] args) throws IOException
     {
-        String filename = "Pics/sign1.jpg";
+        String filename = "Pics/alet1.jpg";
         int index = filename.indexOf(".");
         String type = filename.substring(index + 1);
 

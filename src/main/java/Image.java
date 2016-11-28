@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -8,10 +9,10 @@ import java.util.Arrays;
  * Created by Rohan D'Souza on 11/8/2016.
  */
 public class Image {
-    public static final int BLACK = toRGB(255,0,0,0);
-    public static final int WHITE = toRGB (255,255,255,255);
-    public static final int RED = toRGB(255,255,0,0);
-    public static final int BLUE = toRGB (255,0,0,255);
+    static final int BLACK = toRGB(255,0,0,0);
+    static final int WHITE = toRGB (255,255,255,255);
+    static final int RED = toRGB(255,255,0,0);
+    static final int BLUE = toRGB (255,0,0,255);
 
 
     public static int[] imageHistogram(BufferedImage input)
@@ -176,6 +177,7 @@ public class Image {
         for (int x = 0; x < img.getWidth()-1; x++) {
             for (int y = 0; y < img.getHeight()-1; y++) {
                 if (nextVPix != toBinary(img.getRGB(x,y))) {
+
                     img.setRGB(x,y,RED);
                 }
                 nextVPix = toBinary(img.getRGB(x+1, y+1));
@@ -196,14 +198,40 @@ public class Image {
         return img;
     }
 
-    public static BufferedImage Segment(BufferedImage img) {
+    public static ArrayList<BufferedImage> Segment(BufferedImage img) {
+        ArrayList<BufferedImage> segments = new ArrayList<BufferedImage>();
+
+        //make boolean image: logs which pixels have been recorded into
+        boolean[][] visited = new boolean[img.getWidth()][img.getHeight()];
+        //set all boolean values to false
+        for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                visited[i][j] = false;
+            }
+        }
+
         for (int y = 0; y < img.getHeight (); y++) {
             for (int x = 0; x < img.getWidth (); x++) {
-                if (img.getRGB (x,y) == RED) {
+                if (img.getRGB (x,y) == RED && !visited[x][y]) {
+
                 }
             }
         }
         return null;
+    }
+
+    public static BufferedImage
+
+    public static ArrayList<int[]> getSurroundPixels(BufferedImage img, int x, int y) {
+        ArrayList<int[]> pixels = new ArrayList<int[]>(8);
+        for (int i = x - 1; i < x+2; i++) {
+            for (int j = y-1; j < y+2; j++) {
+                if (i >= 0 && j >= 0) {
+                    pixels.add(new int[]{i,j});
+                }
+            }
+        }
+        return pixels;
     }
 
     public static int[][] getMaxims(BufferedImage img, int x, int y) {
