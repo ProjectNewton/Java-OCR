@@ -220,7 +220,6 @@ public class Image {
         return null;
     }
 
-    public static BufferedImage
 
     public static ArrayList<int[]> getSurroundPixels(BufferedImage img, int x, int y) {
         ArrayList<int[]> pixels = new ArrayList<int[]>(8);
