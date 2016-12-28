@@ -31,18 +31,25 @@ public class OCR
         BufferedImage nredImg = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
         BufferedImage outlImg = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
 
-        grayImg = Image.grayscale(origImg);
+        grayImg = Process.grayscale(origImg);
         ImageIO.write(grayImg, type, gray);
 
-        otsuImg = Image.binarize(grayImg);
+        otsuImg = Process.binarize(grayImg);
         ImageIO.write(otsuImg, type, otsu);
 
-        nredImg = Image.reduceNoise(otsuImg);
-        nredImg = Image.reduceNoise(nredImg);
-        nredImg = Image.reduceNoise(nredImg);
+        int times = 3;
+        for (int i = 0; i < times-1; i++) {
+            if (i==1) {
+                nredImg = Process.reduceNoise(otsuImg);
+            }
+            else {
+                nredImg = Process.reduceNoise(nredImg);
+            }
+        }
         ImageIO.write(nredImg, type, nred);
 
-        outlImg = Image.outline(nredImg);
+        outlImg = Process.outline(nredImg);
+
         ImageIO.write(outlImg, type, outl);
 
 
