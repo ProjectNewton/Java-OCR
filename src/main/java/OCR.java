@@ -8,6 +8,9 @@
 
 import java.awt.image.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import javax.imageio.*;
 
 public class OCR
@@ -25,11 +28,11 @@ public class OCR
         File nred = new File(filename.substring(0, index) + "_nred." + type);
         File outl = new File(filename.substring(0, index) + "_outl." + type);
 
-        BufferedImage origImg = ImageIO.read(orig);
-        BufferedImage grayImg = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
-        BufferedImage otsuImg = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
-        BufferedImage nredImg = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
-        BufferedImage outlImg = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
+        BufferedImage origImg   = ImageIO.read(orig);
+        BufferedImage grayImg   = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
+        BufferedImage otsuImg   = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
+        BufferedImage nredImg   = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
+        BufferedImage outlImg   = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
 
         grayImg = Process.grayscale(origImg);
         ImageIO.write(grayImg, type, gray);
@@ -49,9 +52,18 @@ public class OCR
         ImageIO.write(nredImg, type, nred);
 
         outlImg = Process.outline(nredImg);
+        //Process.outlinel(nredImg);
 
         ImageIO.write(outlImg, type, outl);
 
+        HashSet<BufferedImage> segments = (HashSet<BufferedImage>) Process.segment(new Image (outlImg));
+
+        int i = 0;
+        for (BufferedImage segment : segments) {
+            File segmnt = new File ( filename.substring ( 0, index ) + "_segmtn" + i + "." + type );
+            ImageIO.write ( segment, type, segmnt );
+            i++;
+        }
 
     }
 }

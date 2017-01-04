@@ -4,15 +4,14 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Rohan D'Souza on 11/8/2016.
  */
 public class Process {
-    static final int BLACK = toRGB(255,0,0,0);
-    static final int WHITE = toRGB (255,255,255,255);
-    static final int RED = toRGB(255,255,0,0);
-    static final int BLUE = toRGB (255,0,0,255);
+
 
 
     public static int[] imageHistogram(BufferedImage input)
@@ -49,7 +48,7 @@ public class Process {
                 red = (int) (0.21 * red + 0.71 * green + 0.07 * blue);
                 if (red < 240)
                     red = (int) (burn * red);
-                pixel = toRGB(alpha, red, red, red);
+                pixel = Image.toRGB(alpha, red, red, red);
                 g.setRGB(i, j, pixel);
             }
 
@@ -108,7 +107,7 @@ public class Process {
                     pixel = 255;
                 else
                     pixel = 0;
-                pixel = toRGB(alpha, pixel, pixel, pixel);
+                pixel = Image.toRGB(alpha, pixel, pixel, pixel);
                 binarized.setRGB(i, j, pixel);
             }
 
@@ -164,107 +163,132 @@ public class Process {
         return r;
     }
 
-    public static int toRGB(int alpha, int red, int green, int blue)
-    {
-        Color pixel = new Color(red, green, blue, alpha);
-        return pixel.getRGB();
-    }
+
 
 
     public static BufferedImage outline(BufferedImage img) {
         //vertical test
-        boolean nextVPix = toBinary(img.getRGB(1,1));
+        int nextVPix = img.getRGB(1,1);
         for (int x = 0; x < img.getWidth()-1; x++) {
             for (int y = 0; y < img.getHeight()-1; y++) {
-                if (nextVPix != toBinary(img.getRGB(x,y))) {
-
-                    img.setRGB(x,y,RED);
+                if (nextVPix != img.getRGB(x,y)) {
+                    img.setRGB(x,y,Image.RED);
                 }
-                nextVPix = toBinary(img.getRGB(x+1, y+1));
+                nextVPix = img.getRGB(x+1, y+1);
             }
         }
 
+
         //horizontal test
-        boolean nextHPix = toBinary(img.getRGB(1,1));
+        boolean nextHPix = Image.toBinary(img.getRGB(1,1));
         for (int y = 0; y < img.getHeight()-1; y++) {
             for (int x = 0; x < img.getWidth()-1; x++) {
-                if (nextHPix != toBinary(img.getRGB(x,y))) {
-                    img.setRGB(x,y,RED);
+                if (nextHPix != Image.toBinary(img.getRGB(x,y))) {
+                    img.setRGB(x,y,Image.RED);
                 }
-                nextHPix = toBinary(img.getRGB(x+1,y+1));
+                nextHPix = Image.toBinary(img.getRGB(x+1,y+1));
             }
         }
 
         return img;
     }
 
-    public static ArrayList<BufferedImage> Segment(BufferedImage img) {
-        ArrayList<BufferedImage> segments = new ArrayList<BufferedImage>();
+    /*public static void outlinel(BufferedImage image) {
+        for (int x = 0; x < image.getWidth ()-1; x++) {
+            for (int y = 0; y < image.getHeight ()-1; y++) {
+                Point point = new Point ( x, y );
+                int color = image.getRGB ( point.x, point.y );
+                Set<Point> pixels = Image.getSurroundPixels ( point, image.getWidth(), image.getHeight() );
+                for (Point surrPoint : pixels) {
+                    if(Image.toBinary (image.getRGB (surrPoint.x, surrPoint.y)) ^
+                            Image.toBinary ( image.getRGB (point.x, point.y) )) {
+                        image.setRGB (x,y, Image.RED);
+                        break;
+                    }
 
-
-
-        for (int y = 0; y < img.getHeight (); y++) {
-            for (int x = 0; x < img.getWidth (); x++) {
-                if (img.getRGB (x,y) == RED && !visited[x][y]) {
-                    int[] pixel = {x,y};
-                    ArrayList<int[]> start = new ArrayList<int[]>(1);
-                    start.add(pixel);
-                    copy(img,start);
                 }
             }
         }
-        return null;
+    }*/
+
+
+    /*
+     * All the following methods are dedicated to segmenting the
+     * outlined image into an array of BufferedImages that each
+     * hold a character
+     *
+     * All these methods are intended to be run after the folling:
+     *      *GrayScale
+     *      *NoiseReduction
+     *      *Binirization
+     *      *Outline
+     *
+     */
+
+
+    public static Set<BufferedImage> segment (Image image) {
+        Set<BufferedImage> segments = new HashSet<BufferedImage>();
+        Set<Polygon> polygons = getPolygons (image);
+        for (Polygon polygon: polygons) {
+            segments.add ( copyToBuffImg (image,polygon) );
+        }
+        return segments;
     }
-
-    public static ArrayList<int[]> copy(BufferedImage img, ArrayList<int[]> pixels, boolean[][] visited) {
-
-    }
-
-
-    public static ArrayList<int[]> getSurroundPixels(BufferedImage img, int x, int y) {
-        ArrayList<int[]> pixels = new ArrayList<int[]>(8);
-        for (int i = x - 1; i < x+2; i++) {
-            for (int j = y-1; j < y+2; j++) {
-                if (i >= 0 && j >= 0) {
-                    pixels.add(new int[]{i,j});
+    public static Set<Polygon> getPolygons(Image image) {
+        Set<Polygon> polygons = new HashSet<Polygon>();
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                Point point = new Point(x,y);
+                if (image.getRGB(x,y) == Image.RED && !image.getVisited()[x][y]) {
+                    Polygon polygon = new Polygon();
+                    toPolygon (image, point, polygon);
+                    polygons.add (polygon);
                 }
             }
         }
-        return pixels;
+        return polygons;
     }
 
-    public static int[][] getMaxims(BufferedImage img, int x, int y) {
-        int left = 0, right = 0, top = 0, bottom = 0;
-        for (int j = 0; j < 3; j++) {
-            for (int i = 0; i < 3; i++) {
-                if (x > 0) {
-                    x--;
-                } else if (y > 0) {
-                    y--;
-                } else {
-                    i++; j++;
-                }
+    // This method will only work with binarized and outlines images
+    static void toPolygon(Image image, Point point, Polygon polygon) {
+        if (image.getVisited(point)) {
+            image.setVisited (point, true);
+        }
+        if (!image.getVisited(point) && image.getRGB(point.x, point.y) == Image.RED) {
+            image.setVisited(point, true);          //set point to visited
+            polygon.addPoint(point.x, point.y);     //added point as vertex
+            Set<Point> surrndPnts = image.getSurroundPixels(point); //got surrounding points
+            for (Point pnt: surrndPnts) {
+                toPolygon (image, pnt, polygon);
+            }
+        }
+    }
 
-                if (j < left) {
-                    left = j;
-                }
-                if (j > right) {
-                    right = j;
-                }
-                if (i < bottom) {
-                    bottom = i;
-                }
-                if (i > top) {
-                    top = i;
+    static BufferedImage copyToBuffImg (Image image, Polygon polygon) {
+        Rectangle bounds = polygon.getBounds();
+        BufferedImage img = new BufferedImage (bounds.width, bounds.height, image.getType());
+        Image.setBufferedImage ( img, Image.WHITE );
+        for (int x = bounds.x; x < bounds.width; x++) {
+            for (int y = bounds.y; y < bounds.height; y++) {
+                Point point = new Point (x,y);
+                if ( polygon.contains (point) ) {
+                    img.setRGB (x - bounds.x ,y - bounds.y, Image.BLACK );
                 }
             }
         }
-        return new int[][] {
-                {left,top}, {left, bottom}, {right, top}, {right,bottom}
-        };
+        return img;
+    }
+    static boolean inPolygons (Iterable<Polygon> polygons, Point point) {
+        for (Polygon polygon : polygons) {
+            if (polygon.contains(point)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public static boolean toBinary(int rgb) {
-        return rgb == BLACK;
-    }
+
+
+
+
 }
