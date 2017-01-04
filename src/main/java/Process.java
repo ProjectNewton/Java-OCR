@@ -180,13 +180,13 @@ public class Process {
 
 
         //horizontal test
-        boolean nextHPix = Image.toBinary(img.getRGB(1,1));
+        int nextHPix = img.getRGB(1,1);
         for (int y = 0; y < img.getHeight()-1; y++) {
             for (int x = 0; x < img.getWidth()-1; x++) {
-                if (nextHPix != Image.toBinary(img.getRGB(x,y))) {
+                if (nextHPix != img.getRGB(x,y)) {
                     img.setRGB(x,y,Image.RED);
                 }
-                nextHPix = Image.toBinary(img.getRGB(x+1,y+1));
+                nextHPix = img.getRGB(x+1,y+1);
             }
         }
 
