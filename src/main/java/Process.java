@@ -239,7 +239,7 @@ public class Process {
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 Point point = new Point(x,y);
-                if (image.getRGB(x,y) == Image.RED && !image.getVisited()[x][y]) {
+                if (!image.getVisited()[x][y] && image.getRGB(x,y) == Image.RED) {
                     Polygon polygon = new Polygon();
                     toPolygon (image, point, polygon);
                     polygons.add (polygon);
@@ -252,9 +252,14 @@ public class Process {
     // This method will only work with binarized and outlines images
     static void toPolygon(Image image, Point point, Polygon polygon) {
         if (image.getVisited(point)) {
-            image.setVisited (point, true);
+            return;
         }
-        if (!image.getVisited(point) && image.getRGB(point.x, point.y) == Image.RED) {
+        int rgb = image.getRGB(point.x, point.y);
+        if (rgb != Image.RED) {
+            image.setVisited (point, true);
+            return;
+        }
+        if (!image.getVisited(point) && rgb == Image.RED) {
             image.setVisited(point, true);          //set point to visited
             polygon.addPoint(point.x, point.y);     //added point as vertex
             Set<Point> surrndPnts = image.getSurroundPixels(point); //got surrounding points
